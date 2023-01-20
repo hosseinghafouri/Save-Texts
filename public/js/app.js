@@ -12,7 +12,6 @@ const handleItem = function (itemName) {
     const items = itemList.querySelectorAll('.item');
 
     items.forEach(function (item) {
-
         if (item.querySelector('.item-name').textContent === itemName) {
             //edit event listener
             item.querySelector('.edit-item').addEventListener('click', function () {
@@ -25,14 +24,29 @@ const handleItem = function (itemName) {
             });
             // delete event listener
             item.querySelector('.delete-item').addEventListener('click', function () {
-                debugger;
-                itemList.removeChild(item);
+                // debugger;
+                
+                console.log(item);
+    
+                // todoItems = [];
+                // getList(todoItems);
+                // localStorage.removeItem(item);
+                // itemList.removeChild(item);
 
                 todoItems = todoItems.filter(function (item) {
                     return item !== itemName;
                 });
 
-                showFeedback('item delete', 'success');
+                
+                let localTodos = JSON.parse(localStorage.getItem("todoItems"));
+                todosArray = localTodos;
+                let localTodosIndex = localTodos.findIndex((index)=>{
+                    return index.id === item.id;
+                });
+                todosArray.splice(localTodosIndex, 1);
+                setLocalStorage(todoItems);
+                getList(todoItems);
+                // showFeedback('item delete', 'success');
             })
         }
     })
@@ -42,19 +56,17 @@ itemInput.addEventListener("focus", () => {
     console.log(itemInput.value);
 });
 
-const removeItem = function (item) {
-    console.log(item);
-    const removeIndex = (todoItems.indexOf(item));
-    console.log(removeIndex);
-    todoItems.splice(removeIndex, 1);
-}
+// const removeItem = function (item) {
+//     const removeIndex = (todoItems.indexOf(item));
+//     console.log(removeIndex);
+//     todoItems.splice(removeIndex, 1);
+// }
 
 const getList = function (todoItems) {
     itemList.innerHTML = '';
-
+    
     todoItems.forEach(function (item) {
         itemList.insertAdjacentHTML('beforeend', `<div class="item my-3"><h5 class="item-name text-capitalize">${item}</h5><div class="item-icons"><a href="#" class="edit-item mx-2 item-icon" title="Edit Text"><i class="far fa-edit"></i></a><a href="#" class="delete-item item-icon" title="Delete Text"><i class="far fa-times-circle"></i></a></div></div>`);
-
         handleItem(item);
     });
 }
@@ -67,6 +79,7 @@ const getLocalStorage = function () {
     } else {
         todoItems = JSON.parse(todoStorage);
         getList(todoItems);
+        getItemListFromServer();
     }
 }
 
@@ -74,8 +87,40 @@ const setLocalStorage = function (todoItems) {
     localStorage.setItem('todoItems', JSON.stringify(todoItems));
 }
 
+let hostname = window.location.hostname;
+let portocolName = window.location.protocol;
+
+function getItemListFromServer() {
+    fetch(`${portocolName}//${hostname}/api/list`)
+    .then((response) => response.json())
+    .then((data) => {
+        data.texts.forEach((text) => {
+            todoItems.push(text)
+        })
+    });
+}
+
+function golobalSet(txt) {
+   
+    apiBody = {
+        text:txt
+    }
+
+    fetch(`${portocolName}//${hostname}/create`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        
+        body : JSON.stringify(apiBody)
+    })
+        .then(response => console.log(response))
+
+};
+
 // get local storage from page
 getLocalStorage();
+getItemListFromServer();
 
 //add an item to the List, including to local storage
 form.addEventListener('submit', function (e) {
