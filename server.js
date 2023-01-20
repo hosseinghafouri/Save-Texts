@@ -6,9 +6,18 @@ const http = require('http'),
 
 http.createServer((req, res) => {
     let route = router.web.get.find(route => route[0] == req.url)
+    let api = router.api.get.find(api => api[0] == req.url)
+
+
     if (route) {
         res.writeHead(200, { 'Content-Type': 'text/html' })
-        res.write(route[1]())
+        res.write(route[1](res))
+        res.end()
+        return
+    }
+    if(api){
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.write(api[1](res))
         res.end()
         return
     }

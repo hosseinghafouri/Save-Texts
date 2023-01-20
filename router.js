@@ -4,12 +4,17 @@ const note = require('./controller/note');
 const web = {
     get: [
         ['/', note.index],
-        ['/create/?', ]
     ],
 }
 
 const api = {
+    get: [
+        ['/api/list', note.list]
+    ],
 
+    post: [
+        ['/api/create', note.create]
+    ]
 }
 
 module.exports.web = web
