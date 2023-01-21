@@ -11,13 +11,13 @@ http.createServer((req, res) => {
 
     if (route) {
         res.writeHead(200, { 'Content-Type': 'text/html' })
-        res.write(route[1](res))
+        res.write(route[1](req))
         res.end()
         return
     }
     if(api){
         res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.write(api[1](res))
+        res.write(api[1](req))
         res.end()
         return
     }
@@ -55,3 +55,5 @@ http.createServer((req, res) => {
 
 
 }).listen(80)
+
+console.log('running on localhost:80');

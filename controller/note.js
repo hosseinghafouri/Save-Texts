@@ -2,15 +2,29 @@ const fs = require('fs')
 const notemodel = require('../model/note');
 
 const note = {
-    index: ()=>{
+    index: () => {
         return fs.readFileSync('./public/index.html')
     },
 
-    create: (req)=>{
-        
+    create: (req) => {
+        if (req.method == 'POST') {
+            var body = ''
+            req.on('data', function (data) {
+                body += data
+            })
+            req.on('end', function () {
+                let data = JSON.parse(body)
+                notemodel.put.add(data.text)
+            })
+            return '201'
+
+        } else {
+            return 'post request exceptable.';
+
+        }
     },
 
-    list: ()=>{
+    list: () => {
         return notemodel.get.all()
     }
 }

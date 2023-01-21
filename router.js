@@ -9,10 +9,7 @@ const web = {
 
 const api = {
     get: [
-        ['/api/list', note.list]
-    ],
-
-    post: [
+        ['/api/list', note.list],
         ['/api/create', note.create]
     ]
 }
