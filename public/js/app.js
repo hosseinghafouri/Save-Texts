@@ -6,13 +6,18 @@ const feedback = document.querySelector('.feedback');
 const clearButton = document.querySelector('#clear-list');
 
 let todoItems = [];
-
+let serverItems = [];
 const handleItem = function (itemName) {
 
     const items = itemList.querySelectorAll('.item');
 
     items.forEach(function (item) {
         if (item.querySelector('.item-name').textContent === itemName) {
+            //Golobal event listener
+            item.querySelector('.golobal-item').addEventListener('click', function () {
+                let text = item.firstChild.innerHTML;
+                setItemListForServer(text);
+            });
             //edit event listener
             item.querySelector('.edit-item').addEventListener('click', function () {
                 itemInput.value = itemName;
@@ -25,9 +30,9 @@ const handleItem = function (itemName) {
             // delete event listener
             item.querySelector('.delete-item').addEventListener('click', function () {
                 // debugger;
-                
+
                 console.log(item);
-    
+
                 // todoItems = [];
                 // getList(todoItems);
                 // localStorage.removeItem(item);
@@ -37,10 +42,11 @@ const handleItem = function (itemName) {
                     return item !== itemName;
                 });
 
-                
+
+
                 let localTodos = JSON.parse(localStorage.getItem("todoItems"));
                 todosArray = localTodos;
-                let localTodosIndex = localTodos.findIndex((index)=>{
+                let localTodosIndex = localTodos.findIndex((index) => {
                     return index.id === item.id;
                 });
                 todosArray.splice(localTodosIndex, 1);
@@ -62,11 +68,12 @@ itemInput.addEventListener("focus", () => {
 //     todoItems.splice(removeIndex, 1);
 // }
 
+
+
 const getList = function (todoItems) {
     itemList.innerHTML = '';
-    
     todoItems.forEach(function (item) {
-        itemList.insertAdjacentHTML('beforeend', `<div class="item my-3"><h5 class="item-name text-capitalize">${item}</h5><div class="item-icons"><a href="#" class="edit-item mx-2 item-icon" title="Edit Text"><i class="far fa-edit"></i></a><a href="#" class="delete-item item-icon" title="Delete Text"><i class="far fa-times-circle"></i></a></div></div>`);
+        itemList.insertAdjacentHTML('beforeend', `<div class="item my-3"><h5 class="item-name text-capitalize">${item}</h5><div class="item-icons"><a href="#" class="golobal-item mx-2 item-icon" title="Edit Text"><i class="fa fa-globe" aria-hidden="true"></i></a><a href="#" class="edit-item mx-2 item-icon" title="Edit Text"><i class="far fa-edit"></i></a><a href="#" class="delete-item item-icon" title="Delete Text"><i class="far fa-times-circle"></i></a></div></div>`);
         handleItem(item);
     });
 }
@@ -79,7 +86,6 @@ const getLocalStorage = function () {
     } else {
         todoItems = JSON.parse(todoStorage);
         getList(todoItems);
-        getItemListFromServer();
     }
 }
 
@@ -90,20 +96,45 @@ const setLocalStorage = function (todoItems) {
 let hostname = window.location.hostname;
 let portocolName = window.location.protocol;
 
+function setItemListForServer(text) {
+    let body = {
+        "text" : text
+    }
+    fetch(`${portocolName}//${hostname}/api/create`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body)
+        
+    });
+};
+
 function getItemListFromServer() {
     fetch(`${portocolName}//${hostname}/api/list`)
-    .then((response) => response.json())
-    .then((data) => {
-        data.texts.forEach((text) => {
-            todoItems.push(text)
-        })
-    });
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            let todoItemsLocal = JSON.parse(localStorage.getItem("todoItems"));
+            console.log(todoItemsLocal);
+            if (todoItemsLocal === null) {
+                todoItemsLocal = [];
+            }
+            data.texts.forEach((text) => {
+                if (!todoItemsLocal.includes(text)) {
+                    todoItemsLocal.push(text);
+                }
+
+            });
+            localStorage.setItem('todoItems', JSON.stringify(todoItemsLocal));
+            getLocalStorage();
+        });
 }
 
 function golobalSet(txt) {
-   
+
     apiBody = {
-        text:txt
+        text: txt
     }
 
     fetch(`${portocolName}//${hostname}/create`, {
@@ -111,15 +142,15 @@ function golobalSet(txt) {
         headers: {
             "Content-Type": "application/json"
         },
-        
-        body : JSON.stringify(apiBody)
+
+        body: JSON.stringify(apiBody)
     })
         .then(response => console.log(response))
 
 };
 
 // get local storage from page
-getLocalStorage();
+
 getItemListFromServer();
 
 //add an item to the List, including to local storage
@@ -151,5 +182,6 @@ clearButton.addEventListener('click', function () {
     todoItems = [];
     localStorage.clear();
     getList(todoItems);
+
 })
 
