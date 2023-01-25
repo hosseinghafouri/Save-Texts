@@ -1,4 +1,5 @@
 const fs = require('fs')
+const url = require('url');
 const notemodel = require('../model/note');
 
 const note = {
@@ -26,6 +27,17 @@ const note = {
 
     list: () => {
         return notemodel.get.all()
+    },
+
+    destroy: (req)=>{
+        let request = url.parse(req.url, true).query
+
+        let result = notemodel.modify.delete(request.t)
+        if (!result) {
+            return `{"status":"sorry we couldnt find this text"}`
+        }
+        return notemodel.get.all()
+
     }
 }
 

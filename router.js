@@ -10,7 +10,8 @@ const web = {
 const api = {
     get: [
         ['/api/list', note.list],
-        ['/api/create', note.create]
+        ['/api/create', note.create],
+        ['/api/delete', note.destroy]
     ]
 }
 

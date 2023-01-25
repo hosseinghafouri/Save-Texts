@@ -5,8 +5,10 @@ const http = require('http'),
     path = require('path')
 
 http.createServer((req, res) => {
-    let route = router.web.get.find(route => route[0] == req.url)
-    let api = router.api.get.find(api => api[0] == req.url)
+    requsetUrl = url.parse(req.url).pathname
+
+    let route = router.web.get.find(route => route[0] == requsetUrl)
+    let api = router.api.get.find(api => api[0] == requsetUrl)
 
 
     if (route) {
