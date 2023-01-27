@@ -150,7 +150,7 @@ function golobalSet(txt) {
 };
 
 function deleteItemListFromServer(text) {
-    fetch(`${portocolName}//${hostname}/api/delete?t=`, {
+    fetch(`${portocolName}//${hostname}/api/delete?t=${text}`, {
         method: "GET"
     })
     .then(res => console.log(res))
