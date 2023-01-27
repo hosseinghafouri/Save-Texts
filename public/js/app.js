@@ -31,13 +31,13 @@ const handleItem = function (itemName) {
             item.querySelector('.delete-item').addEventListener('click', function () {
                 // debugger;
 
-                console.log(item);
+                console.log(item.firstChild.innerHTML);
 
                 // todoItems = [];
                 // getList(todoItems);
                 // localStorage.removeItem(item);
                 // itemList.removeChild(item);
-
+                deleteItemListFromServer(item.firstChild.innerHTML);
                 todoItems = todoItems.filter(function (item) {
                     return item !== itemName;
                 });
@@ -73,7 +73,7 @@ itemInput.addEventListener("focus", () => {
 const getList = function (todoItems) {
     itemList.innerHTML = '';
     todoItems.forEach(function (item) {
-        itemList.insertAdjacentHTML('beforeend', `<div class="item my-3"><h5 class="item-name text-capitalize">${item}</h5><div class="item-icons"><a href="#" class="golobal-item mx-2 item-icon" title="Edit Text"><i class="fa fa-globe" aria-hidden="true"></i></a><a href="#" class="edit-item mx-2 item-icon" title="Edit Text"><i class="far fa-edit"></i></a><a href="#" class="delete-item item-icon" title="Delete Text"><i class="far fa-times-circle"></i></a></div></div>`);
+        itemList.insertAdjacentHTML('beforeend', `<div class="item my-3"><h5 class="item-name">${item}</h5><div class="item-icons"><a href="#" class="golobal-item mx-2 item-icon" title="Edit Text"><i class="fa fa-globe" aria-hidden="true"></i></a><a href="#" class="edit-item mx-2 item-icon" title="Edit Text"><i class="far fa-edit"></i></a><a href="#" class="delete-item item-icon" title="Delete Text"><i class="far fa-times-circle"></i></a></div></div>`);
         handleItem(item);
     });
 }
@@ -149,6 +149,12 @@ function golobalSet(txt) {
 
 };
 
+function deleteItemListFromServer(text) {
+    fetch(`${portocolName}//${hostname}/api/delete?t=`, {
+        method: "GET"
+    })
+    .then(res => console.log(res))
+}
 // get local storage from page
 
 getItemListFromServer();
